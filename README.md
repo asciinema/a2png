@@ -30,4 +30,6 @@ For example:
 
 ## License
 
-Copyright &copy; 2017 Marcin Kulik.
+Copyright © 2017 Marcin Kulik.
+
+All code is licensed under MIT license. See LICENSE file for details.
