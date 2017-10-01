@@ -1,6 +1,6 @@
 (ns asciinema.png.main
   (:require [cljs.nodejs :as nodejs]
-            [asciinema.player.source :as source]
+            [asciinema.player.asciicast :as asciicast]
             [asciinema.player.frames :as frames]
             [asciinema.player.screen :as screen]
             [cljs.core.async :refer [<! put! chan timeout]]
@@ -46,7 +46,7 @@
     (put! ch data)))
 
 (defn- load-asciicast [url]
-  (let [ch (chan 1 (map (comp source/initialize-asciicast parse-json)))]
+  (let [ch (chan 1 (map asciicast/load))]
     (if (str/starts-with? url "http")
       (http-get url ch)
       (read-file url ch))
