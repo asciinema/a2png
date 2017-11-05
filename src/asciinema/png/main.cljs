@@ -16,11 +16,6 @@
 (def html-path (.resolve path (js* "__dirname") "page" "a2png.html"))
 (def js-path (.resolve path (js* "__dirname") "a2png.js"))
 
-(defn- parse-json [json]
-  (-> json
-      JSON.parse
-      (js->clj :keywordize-keys true)))
-
 (defn- to-json [obj]
   (-> obj
       clj->js
