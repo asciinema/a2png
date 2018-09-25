@@ -3,9 +3,11 @@
             [asciinema.player.asciicast :as asciicast]
             [asciinema.player.frames :as frames]
             [asciinema.player.screen :as screen]
+            [asciinema.png.helpers :refer [safe-map]]
             [cljs.core.async :refer [<! put! chan timeout]]
             [clojure.string :as str])
-  (:require-macros [cljs.core.async.macros :refer [go]]))
+  (:require-macros [asciinema.png.macros :refer [<?]]
+                   [cljs.core.async.macros :refer [go]]))
 
 (nodejs/enable-util-print!)
 
@@ -41,7 +43,7 @@
     (put! ch data)))
 
 (defn- load-asciicast [url]
-  (let [ch (chan 1 (map asciicast/load))]
+  (let [ch (chan 1 (safe-map asciicast/load))]
     (if (str/starts-with? url "http")
       (http-get url ch)
       (read-file url ch))
@@ -55,7 +57,7 @@
         scale (nth args 4 1)]
     (println (str "loading " url "..."))
     (go
-      (let [{:keys [width height frames]} (<! (load-asciicast url))]
+      (let [{:keys [width height frames]} (<? (load-asciicast url))]
         (println (str "generating screen at " time "..."))
         (let [screen (->> frames (frames/frame-at time) last)
               poster (to-json {:lines (screen/lines screen)
