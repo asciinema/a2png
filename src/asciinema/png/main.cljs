@@ -49,6 +49,20 @@
       (read-file url ch))
     ch))
 
+(defn- frame-at [data xf time]
+  (transduce xf
+             (fn
+               ([last] last)
+               ([last frame]
+                (if (frames/frame-before-or-at? time frame)
+                  frame
+                  (reduced last))))
+             nil
+             data))
+
+(defn- screen-at [data xf time]
+  (last (frame-at data xf time)))
+
 (defn -main [& args]
   (let [url (first args)
         out-path (nth args 1)
@@ -57,9 +71,9 @@
         scale (nth args 4 1)]
     (println (str "loading " url "..."))
     (go
-      (let [{:keys [width height frames]} (<? (load-asciicast url))]
+      (let [{:keys [width height data xf]} (<? (load-asciicast url))]
         (println (str "generating screen at " time "..."))
-        (let [screen (->> frames (frames/frame-at time) last)
+        (let [screen (screen-at data xf time)
               poster (to-json {:lines (screen/lines screen)
                                :cursor (screen/cursor screen)})
               program (.exec phantomjs js-path html-path poster out-path width height theme scale)]
