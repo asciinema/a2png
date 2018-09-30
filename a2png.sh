@@ -4,7 +4,15 @@ set -e
 
 a2png_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-node --max-old-space-size=512 "${a2png_dir}/main.js" "$@"
+if [ $(which timeout 2>/dev/null) ]; then
+    timeout="timeout -k 5 ${A2PNG_TIMEOUT:-30}"
+elif [ $(which gtimeout 2>/dev/null) ]; then
+    timeout="gtimeout -k 5 ${A2PNG_TIMEOUT:-30}"
+else
+    timeout=""
+fi
+
+$timeout node --max-old-space-size=384 "${a2png_dir}/main.js" "$@"
 
 out=$2
 
